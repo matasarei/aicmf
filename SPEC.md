@@ -65,21 +65,31 @@ AICMF follows a TDD-First workflow for all functional logic, commands, and APIs:
 4. **Validation:** Features are considered complete only when their behavior is verified by the test suite.
 
 ## 5. [AGENT INSTRUCTION SET]
-1. **Docker First:** Build and start containers before any PHP/Composer work.
+> ⚠️ **This repository already contains a complete, working implementation.**
+> Your task is to **clone and run it**, *not* to regenerate it. Do **NOT** run
+> `composer create-project`, scaffold a fresh Symfony skeleton, or rewrite the
+> existing `src/`, `tests/`, `config/`, or `docker/` files. Cloning ≠ rebuilding
+> from scratch — rebuilding wastes time and diverges from the reference code.
+
+1. **Obtain the code:** Clone this repository (or use the working copy provided).
+   All source, `composer.json`, and `composer.lock` are already present.
+   - `git clone https://github.com/matasarei/aicmf.git && cd aicmf`
+2. **Docker First:** Build and start containers before any PHP/Composer work.
    - `docker-compose build && docker-compose up -d`
    - All subsequent commands run via `docker-compose exec php ...`
-2. **Bootstrap:** Initialize Symfony Flex inside the container.
-   - `docker-compose exec php composer create-project symfony/skeleton . --no-interaction`
-3. **Setup:** Install dependencies inside the container.
-   - `docker-compose exec php composer require erusev/parsedown symfony/orm-pack twig symfony/twig-bundle`
-   - `docker-compose exec php composer require --dev phpunit/phpunit symfony/test-pack`
-4. **Environment:** Generate `.env.local` with `APP_SECRET` inside container.
-5. **Implementation Path:**
-   - [TDD] Create `tests/Integration/DatabaseTest.php` -> Setup SQLite Schema.
-   - [TDD] Create `tests/Command/SyncCommandTest.php` -> Implement `app:sync`.
-   - [TDD] Create `tests/Controller/SearchControllerTest.php` -> Implement `/api/search`.
-6. **UI:** Setup Twig in `src/Themes/default/`.
-7. **Demo:** Add `/content/articles/hello.md` and run `app:sync` inside container.
+3. **Install dependencies (do not add new ones):** Install the *pinned* versions
+   from the committed lockfile.
+   - `docker-compose exec php composer install`
+4. **Environment:** If `.env.local` does not exist, generate one with an `APP_SECRET`:
+   - `docker-compose exec php php -r "file_put_contents('.env.local','APP_SECRET='.bin2hex(random_bytes(16)).PHP_EOL);"`
+5. **Build the index & demo:** `content/articles/hello.md` already ships with the repo.
+   - `docker-compose exec php php bin/console app:sync`
+6. **Verify:** Run the existing suite — it must stay green.
+   - `docker-compose exec php php bin/phpunit`
+
+> When **extending** the project (new features, APIs, commands), follow the
+> TDD-First workflow in §4. When **bootstrapping**, you only install and run —
+> the implementation, tests, Twig theme, and demo content already exist.
 
 ## 6. Container-First Development Rules
 - **Never** run `composer`, `php`, or `bin/console` directly on the host.
