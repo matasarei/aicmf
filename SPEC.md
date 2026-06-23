@@ -85,7 +85,7 @@ AICMF follows a TDD-First workflow for all functional logic, commands, and APIs:
 5. **Build the index & demo:** `content/articles/hello.md` already ships with the repo.
    - `docker-compose exec php php bin/console app:sync`
 6. **Verify:** Run the existing suite — it must stay green.
-   - `docker-compose exec php php bin/phpunit`
+   - `docker-compose exec php php vendor/bin/phpunit`
 
 > When **extending** the project (new features, APIs, commands), follow the
 > TDD-First workflow in §4. When **bootstrapping**, you only install and run —

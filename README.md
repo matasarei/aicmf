@@ -40,5 +40,5 @@ The site is then served at **http://localhost:8081**.
 
 Tests can be run via:
 ```bash
-docker-compose exec php php bin/phpunit
+docker-compose exec php php vendor/bin/phpunit
 ```
