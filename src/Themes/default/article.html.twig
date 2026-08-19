@@ -2,6 +2,8 @@
 
 {% block title %}{{ article.title }} - AICMF{% endblock %}
 
+{% block description %}{{ article.description ?? article.title }}{% endblock %}
+
 {% block content %}
 <article>
     <h1>{{ article.title }}</h1>

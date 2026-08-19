@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+# Point crawlers at the live sitemap (must be an absolute URL — replace with
+# your public origin, matching SITE_BASE_URL in .env.local):
+# Sitemap: https://example.com/sitemap.xml
