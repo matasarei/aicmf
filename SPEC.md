@@ -26,15 +26,19 @@
 │   ├── Modules/            # PSR-4 dynamic extensions
 │   ├── Repository/         # SQLite access
 │   ├── Service/            # ContentParser (frontmatter + Markdown)
+│   ├── Twig/               # Twig extensions (asset_v cache-busting)
 │   └── Themes/
-│       └── default/        # Twig templates (base, index, article)
+│       └── default/        # Twig templates (base, index, article, sitemap)
 ├── tests/
 │   ├── Command/            # SyncCommandTest
 │   ├── Controller/         # SearchControllerTest
 │   └── Integration/        # DatabaseTest
 ├── public/                 # Web root
 │   ├── index.php
+│   ├── robots.txt          # Crawler policy (points at /sitemap.xml)
 │   └── .htaccess           # Apache fallback rewrite rules
+├── .env.local.example      # Production config template (copy to .env.local)
+├── Makefile                # Deploy helper (docker/podman agnostic)
 ├── docker-compose.yml
 └── composer.json
 ```
@@ -52,7 +56,17 @@
 2. **Fallback:** SQL `LIKE` or FTS5 on `title` and `content`.
 3. **Output:** JSON array of matching article metadata.
 
-### C. Infrastructure & Hosting
+### C. SEO Endpoints
+1. **Sitemap (`GET /sitemap.xml`):** Rendered live from the SQLite index — every
+   `app:sync` refreshes it automatically. Links are built from `SITE_BASE_URL`
+   (set the public https origin in `.env.local`; the container only sees plain
+   HTTP behind a TLS proxy, so the request scheme can't be trusted).
+2. **Robots (`public/robots.txt`):** Static crawler policy; uncomment and set the
+   absolute `Sitemap:` URL when deploying.
+3. **Meta descriptions:** The theme exposes a `description` Twig block; article
+   pages fill it from frontmatter `description` (falling back to the title).
+
+### D. Infrastructure & Hosting
 - **Nginx:** Config lives in `docker/nginx/nginx.conf`. Serves `public/` as root with `try_files $uri /index.php$is_args$args`.
 - **Apache:** `public/.htaccess` redirects all non-file requests to `index.php`.
 - **Permissions:** `data/` and `content/` must be writeable by `www-data`.
@@ -80,8 +94,9 @@ AICMF follows a TDD-First workflow for all functional logic, commands, and APIs:
 3. **Install dependencies (do not add new ones):** Install the *pinned* versions
    from the committed lockfile.
    - `docker-compose exec php composer install`
-4. **Environment:** If `.env.local` does not exist, generate one with an `APP_SECRET`:
-   - `docker-compose exec php php -r "file_put_contents('.env.local','APP_SECRET='.bin2hex(random_bytes(16)).PHP_EOL);"`
+4. **Environment:** Nothing to do locally — `.env` ships a dev-only dummy
+   `APP_SECRET`. For production, copy `.env.local.example` to `.env.local` and
+   set real values (`APP_ENV=prod`, a real secret, `SITE_BASE_URL`).
 5. **Build the index & demo:** `content/articles/hello.md` already ships with the repo.
    - `docker-compose exec php php bin/console app:sync`
 6. **Verify:** Run the existing suite — it must stay green.
