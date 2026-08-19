@@ -3,6 +3,8 @@
 /data/*.db-shm
 /data/*.db-wal
 
+/docker-compose.override.yml
+
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -20,4 +22,5 @@
 
 ###> claude-code ###
 /.claude/settings.local.json
+/.claude/repo-profile.json
 ###< claude-code ###
